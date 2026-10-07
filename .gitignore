@@ -1,0 +1,34 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# environment variables
+.env
+.env.production
+.env.*.local
+
+# base de données SQLite (transférée séparément sur le VPS)
+data/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# macOS-specific files
+.DS_Store
+
+# jetbrains / vscode settings
+.idea/
+.vscode/

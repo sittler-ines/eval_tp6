@@ -1,0 +1,50 @@
+name: CI/CD - Déploiement clients
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build (vérification)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Installation des dépendances
+        run: bun install --frozen-lockfile
+
+      - name: Build Astro
+        run: bun run build
+
+  deploy:
+    name: Déploiement sur le VPS
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Déploiement via SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            set -e
+            export PATH="$HOME/.bun/bin:$PATH"
+            cd ~/eval_tp6
+            cp .env ~/.env.clients.bak
+            git fetch origin main
+            git reset --hard origin/main
+            [ -f .env ] || cp ~/.env.clients.bak .env
+            bun install --frozen-lockfile
+            bun run build
+            sudo systemctl restart clients
+            sleep 3
+            systemctl is-active clients
+            curl -fsS -o /dev/null http://127.0.0.1:3344 && echo "Déploiement OK"

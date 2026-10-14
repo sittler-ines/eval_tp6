@@ -1,6 +1,8 @@
 ---
 import { getClients } from "../lib/db.js";
 
+const user = Astro.locals.user;
+
 const clients = getClients();
 
 const clientCount = clients.length;
@@ -150,10 +152,20 @@ const locationsCount = clients.filter(
       border-radius: 10px;
       background: white;
 
+      color: inherit;
+      font-family: inherit;
       font-size: 13px;
       font-weight: 600;
 
+      cursor: pointer;
       transition: 0.2s;
+    }
+
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
     }
 
     .logout:hover {
@@ -468,6 +480,37 @@ const locationsCount = clients.filter(
         </div>
       </div>
     </div>
+
+    {user && (
+      <div class="user-area">
+
+        <div class="user-info">
+          <div class="user-name">
+            {user.name}
+          </div>
+
+          <div class="user-email">
+            {user.email}
+          </div>
+        </div>
+
+        {user.image && (
+          <img
+            class="user-avatar"
+            src={user.image}
+            alt=""
+            referrerpolicy="no-referrer"
+          />
+        )}
+
+        <form method="POST" action="/api/auth/logout">
+          <button class="logout" type="submit">
+            Déconnexion
+          </button>
+        </form>
+
+      </div>
+    )}
 
   </header>
   <main>
